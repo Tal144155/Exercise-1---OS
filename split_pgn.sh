@@ -34,16 +34,15 @@ split_pgn_file() {
     local new_file=""
 
     while IFS= read -r line; do
-        # Check if line starts with "[Event"
+        # Check if line starts with "[Event "
         if [[ "$line" =~ ^\[Event\  ]]; then
-            # If yes, create new file
+            # if it does, create a new file
             ((counter++))
             new_file="${directory}/$(basename "$file" .pgn)_${counter}.pgn"
-            # Create the new file
             touch "$new_file"
             echo "Saved game to $new_file"
         fi
-        # Append line to current output file if output_file is set
+        # add the line to the new file until the next event comes
         if [ -n "$new_file" ]; then
             echo "$line" >> "$new_file"
         fi
