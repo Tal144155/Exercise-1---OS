@@ -98,7 +98,7 @@ void running_shell(char * paths[], int paths_length) {
         fflush(stdout);
         if (fgets(command, sizeof(command), stdin) != NULL) {
             size_t command_length = strlen(command);
-            if(command[command_length-1] = '\n') {
+            if(command[command_length-1] == '\n') {
                 command[command_length-1] = '\0';
             }
             add_command_to_history(command);
@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
         strcat(update_path, argv[i]);
     }
 
-    setenv("PATH", update_path, 0);
+    setenv("PATH", update_path, 1);
     
     
     running_shell(paths, path_number);
