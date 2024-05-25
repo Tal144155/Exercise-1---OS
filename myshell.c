@@ -46,7 +46,38 @@ void print_working_directory() {
     }
 }
 
-void execute_command(char * command, char * paths[], int paths_length) {  
+void execute_fork(char * command, char * arguments[]) {
+
+}
+
+void execute_command(char * command, char * paths[], int paths_length) { 
+    char * arguments[MAX_COMMAND_LENGTH];
+    char * cutter = strtok(command, " ");
+    int counter = 0;
+
+    while(cutter!=NULL) {
+        arguments[counter] = cutter;
+        cutter = strtok(NULL, " ");
+        counter++;
+    }
+
+    arguments[counter] = NULL;
+
+    if (strcmp(arguments[0], "cd") == 0) {
+        if (arguments[1] != NULL) {
+            change_directory(arguments[1]);
+        }
+    } else if (strcmp(arguments[0], "pwd") == 0) {
+        print_working_directory();
+        return;
+    } else if (strcmp(arguments[0], "history") == 0) {
+        print_command_history();
+        return;
+    } else if (strcmp(arguments[0], "exit") == 0) {
+        exit(0);
+    }
+
+
 }
 
 
@@ -69,9 +100,28 @@ void running_shell(char * paths[], int paths_length) {
 int main(int argc, char *argv[]) {
     char * paths[argc + 1];
     int path_number = argc;
+    int path_length = 0;
 
     for(int i=0;i<argc;i++) {
         paths[i] = argv[i];
+        path_length+=strlen(argv[i]) + 1; // adding 1 for the ':' to come inisde the path
     }
+
+    //changing path with new variables, adding it to the old PATH
+    char * old_path = getenv("PATH");
+    size_t new_path_length = strlen(old_path) + 1 + path_length;
+
+    char * update_path = (char *)malloc(new_path_length);
+
+    strcpy(update_path, old_path);
+
+    for (int i = 1; i < argc; i++) {
+        strcat(update_path, ":");
+        strcat(update_path, argv[i]);
+    }
+
+    setenv("PATH", update_path, 1);
+    
+    
     running_shell(paths, path_number);
 }
