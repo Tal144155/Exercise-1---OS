@@ -46,7 +46,17 @@ void print_working_directory() {
     }
 }
 
-void execute_fork(char * command, char * arguments[]) {
+void execute_fork(char * arguments[]) {
+    pid_t pid = fork();
+    if (pid == 0) {
+        execvp(arguments[0], arguments);
+        perror("exec failed");
+        exit(EXIT_FAILURE);
+    } else if (pid < 0) {
+        perror("fork failed");
+    } else {
+        wait(NULL);
+    }
 
 }
 
@@ -74,10 +84,10 @@ void execute_command(char * command, char * paths[], int paths_length) {
         print_command_history();
         return;
     } else if (strcmp(arguments[0], "exit") == 0) {
+
         exit(0);
     }
-
-
+    execute_fork(arguments);
 }
 
 
@@ -102,7 +112,7 @@ int main(int argc, char *argv[]) {
     int path_number = argc;
     int path_length = 0;
 
-    for(int i=0;i<argc;i++) {
+    for(int i=1;i<argc;i++) {
         paths[i] = argv[i];
         path_length+=strlen(argv[i]) + 1; // adding 1 for the ':' to come inisde the path
     }
@@ -120,7 +130,7 @@ int main(int argc, char *argv[]) {
         strcat(update_path, argv[i]);
     }
 
-    setenv("PATH", update_path, 1);
+    setenv("PATH", update_path, 0);
     
     
     running_shell(paths, path_number);
