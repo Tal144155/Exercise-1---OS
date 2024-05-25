@@ -43,9 +43,7 @@ split_pgn_file() {
             echo "Saved game to $new_file"
         fi
         # add the line to the new file until the next event comes
-        if [ -n "$new_file" ]; then
-            echo "$line" >> "$new_file"
-        fi
+        echo "$line" >> "$new_file"
     done < "$file"
     echo "All games have been split and saved to '$directory'."
 }
