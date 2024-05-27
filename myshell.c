@@ -3,8 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
-#include <errno.h>
-#include <limits.h>
+
 
 #define MAX_COMMAND_NUM 100 // max number of commands in the shell
 
@@ -55,12 +54,12 @@ void execute_fork(char * arguments[]) {
     } else if (pid < 0) {
         perror("fork failed");
     } else {
-        wait(NULL);
+        int status;
+        waitpid(pid, &status, 0);
     }
-
 }
 
-void execute_command(char * command, char * paths[], int paths_length) { 
+void execute_command(char * command) {
     char * arguments[MAX_COMMAND_LENGTH];
     char * cutter = strtok(command, " ");
     int counter = 0;
@@ -77,6 +76,7 @@ void execute_command(char * command, char * paths[], int paths_length) {
         if (arguments[1] != NULL) {
             change_directory(arguments[1]);
         }
+        return;
     } else if (strcmp(arguments[0], "pwd") == 0) {
         print_working_directory();
         return;
@@ -84,14 +84,13 @@ void execute_command(char * command, char * paths[], int paths_length) {
         print_command_history();
         return;
     } else if (strcmp(arguments[0], "exit") == 0) {
-
         exit(0);
     }
     execute_fork(arguments);
 }
 
 
-void running_shell(char * paths[], int paths_length) {
+void running_shell() {
     char command[MAX_COMMAND_LENGTH];
     while (1) {
         printf("$ ");
@@ -102,7 +101,7 @@ void running_shell(char * paths[], int paths_length) {
                 command[command_length-1] = '\0';
             }
             add_command_to_history(command);
-            execute_command(command, paths, paths_length);
+            execute_command(command);
         }
     }
 }
@@ -114,7 +113,7 @@ int main(int argc, char *argv[]) {
 
     for(int i=1;i<argc;i++) {
         paths[i] = argv[i];
-        path_length+=strlen(argv[i]) + 1; // adding 1 for the ':' to come inisde the path
+        path_length+=strlen(argv[i]) + 1; // adding 1 for the ':' to come inside the path
     }
 
     //changing path with new variables, adding it to the old PATH
@@ -131,7 +130,6 @@ int main(int argc, char *argv[]) {
     }
 
     setenv("PATH", update_path, 1);
-    
-    
-    running_shell(paths, path_number);
+
+    running_shell();
 }
