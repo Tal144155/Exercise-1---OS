@@ -2,15 +2,15 @@
 
 check_argument_number() {
     if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 <path_to_pgn_file>"
-    exit 1
+        echo "Usage: $0 <path_to_pgn_file>"
+        exit 1
     fi
 }
 
 check_file_exists() {
     if [ ! -f "$1" ]; then
-    echo "File does not exist: $1"
-    exit 1
+        echo "File does not exist: $1"
+        exit 1
     fi
 }
 
@@ -68,7 +68,7 @@ apply_move_on_board() {
 get_piece() {
     local file="$1"
     local rank="$2"
-    local index=$(( (8-rank)*4 + (file-1)*2 ))
+    local index=$(( (file-1)*2 ))
     echo "${board[rank]:$index:1}"
 }
 
@@ -77,7 +77,7 @@ set_piece() {
     local file="$1"
     local rank="$2"
     local piece="$3"
-    local index=$(( (8-rank)*4 + (file-1)*2 ))
+    local index=$(( (file-1)*2 ))
     board[rank]="${board[rank]:0:$index}$piece${board[rank]:$(($index+1))}"
 }
 
