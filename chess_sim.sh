@@ -50,14 +50,13 @@ display_board() {
     echo "Press 'd' to move forward, 'a' to move back, 'w' to go to the start, 's' to go to the end, 'q' to quit:"
 }
 
-# Function to apply a UCI move to the board
-apply_uci_move() {
+apply_move_on_board() {
     local move="$1"
     local from="${move:0:2}"
     local to="${move:2:2}"
-    local from_file=$(ord "${from:0:1}") # a-h
+    local from_file=$(from_letter_to_number "${from:0:1}") # a-h
     local from_rank="${from:1:1}" # 1-8
-    local to_file=$(ord "${to:0:1}") # a-h
+    local to_file=$(from_letter_to_number "${to:0:1}") # a-h
     local to_rank="${to:1:1}" # 1-8
 
     local piece=$(get_piece "$from_file" "$from_rank")
@@ -82,6 +81,56 @@ set_piece() {
     board[rank]="${board[rank]:0:$index}$piece${board[rank]:$(($index+1))}"
 }
 
+from_letter_to_number() {
+    local file="$1"
+    declare -A file_map=( [a]=1 [b]=2 [c]=3 [d]=4 [e]=5 [f]=6 [g]=7 [h]=8 )
+    echo "${file_map[$file]}"
+}
+
+game_function_loop() {
+    while true; do
+        read -n 1 key
+        case "$key" in
+            d)
+                if [ $current_move -lt $move_number ]; then
+                    apply_move_on_board "${uci_moves[$current_move]}"
+                    ((current_move++))
+                else
+                    echo "No more moves available."
+                fi
+                ;;
+            a)
+                if [ $current_move -gt 0 ]; then
+                    ((current_move--))
+                    initialize_board
+                    for ((i=0; i<current_move; i++)); do
+                        apply_move_on_board "${uci_moves[$i]}"
+                    done
+                fi
+                ;;
+            w)
+                initialize_board
+                current_move=0
+                ;;
+            s)
+                initialize_board
+                for move in "${uci_moves[@]}"; do
+                    apply_move_on_board "$move"
+                done
+                current_move=${#uci_moves[@]}
+                ;;
+            q)
+                echo "Exiting."
+                exit 0
+                ;;
+            *)
+                echo "Invalid key pressed: $key"
+                ;;
+        esac
+        display_board $current_move
+    done
+}
+
 # Main script execution
 main() {
     check_argument_number "$@"
@@ -93,10 +142,9 @@ main() {
     parse_pgn "$1"
 
     current_move=0
-    moves_history=()
     display_board $current_move
 
-
+    game_function_loop
 }
 
 # Run the main function
