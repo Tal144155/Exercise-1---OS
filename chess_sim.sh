@@ -54,12 +54,28 @@ apply_move_on_board() {
     local move="$1"
     local from="${move:0:2}"
     local to="${move:2:2}"
+
+    # checking for promotion
+    local promotion_piece=""
+
+    if [ "${#move}" -eq 5 ]; then
+        promotion_piece="${move:4:1}"
+    fi
+
     local from_file=$(from_letter_to_number "${from:0:1}") # a-h
     local from_rank="${from:1:1}" # 1-8
     local to_file=$(from_letter_to_number "${to:0:1}") # a-h
     local to_rank="${to:1:1}" # 1-8
-
     local piece=$(get_piece "$from_file" "$from_rank")
+
+    if [ -n "$promotion_piece" ]; then
+        if [[ "$piece" =~ [P] ]]; then
+            piece=$(echo "$promotion_piece" | tr 'a-z' 'A-Z')
+        else
+            piece=$(echo "$promotion_piece" | tr 'A-Z' 'a-z')
+        fi
+    fi
+    
     set_piece "$from_file" "$from_rank" "."
     set_piece "$to_file" "$to_rank" "$piece"
 }
