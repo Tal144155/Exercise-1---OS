@@ -44,10 +44,9 @@ display_board() {
     echo "  a b c d e f g h"
     for ((i=8; i>=1; i--)); do
         row="${board[i]}"
-        echo "$i $row $i"
+        echo "$i $row  $i"
     done
     echo "  a b c d e f g h"
-    echo "Press 'd' to move forward, 'a' to move back, 'w' to go to the start, 's' to go to the end, 'q' to quit:"
 }
 
 apply_move_on_board() {
@@ -105,12 +104,14 @@ from_letter_to_number() {
 
 game_function_loop() {
     while true; do
+        echo "Press 'd' to move forward, 'a' to move back, 'w' to go to the start, 's' to go to the end, 'q' to quit:"
         read -n 1 key
         case "$key" in
             d)
                 if [ $current_move -lt $move_number ]; then
                     apply_move_on_board "${uci_moves[$current_move]}"
                     ((current_move++))
+                    display_board $current_move
                 else
                     echo "No more moves available."
                 fi
@@ -123,10 +124,12 @@ game_function_loop() {
                         apply_move_on_board "${uci_moves[$i]}"
                     done
                 fi
+                display_board $current_move
                 ;;
             w)
                 initialize_board
                 current_move=0
+                display_board $current_move
                 ;;
             s)
                 initialize_board
@@ -134,16 +137,17 @@ game_function_loop() {
                     apply_move_on_board "$move"
                 done
                 current_move=${#uci_moves[@]}
+                display_board $current_move
                 ;;
             q)
                 echo "Exiting."
+                echo "End of game."
                 exit 0
                 ;;
             *)
                 echo "Invalid key pressed: $key"
                 ;;
         esac
-        display_board $current_move
     done
 }
 

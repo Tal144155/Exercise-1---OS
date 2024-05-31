@@ -31,7 +31,7 @@ void print_command_history() {
 void change_directory(char * new_path) {
     int result_change = chdir(new_path);
     if(result_change != 0) {
-        perror("cd failed");
+        perror("chdir failed");
     }
 }
 
@@ -73,9 +73,7 @@ void execute_command(char * command) {
     arguments[counter] = NULL;
 
     if (strcmp(arguments[0], "cd") == 0) {
-        if (arguments[1] != NULL) {
-            change_directory(arguments[1]);
-        }
+        change_directory(arguments[1]);
         return;
     } else if (strcmp(arguments[0], "pwd") == 0) {
         print_working_directory();
