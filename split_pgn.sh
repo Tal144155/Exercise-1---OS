@@ -27,23 +27,23 @@ file_existing_valid() {
 
 #function to split the PGN file
 split_pgn_file() {
-
+    # creating local variables to hold the data needed
     local file=$1
     local directory=$2
-    local counter=0
-    local new_file=""
+    local counter_games=0
+    local new_pgn_file
+    local file_name=$(basename "$file" .pgn)
 
     while IFS= read -r line; do
-        # Check if line starts with "[Event "
         if [[ "$line" =~ ^\[Event\  ]]; then
-            # if it does, create a new file
-            ((counter++))
-            new_file="${directory}/$(basename "$file" .pgn)_${counter}.pgn"
-            touch "$new_file"
-            echo "Saved game to $new_file"
+            ((counter_games++))
+            new_pgn_file="${directory}/${file_name}_${counter_games}.pgn"
+            echo "Saved game to $new_pgn_file"
+            touch "$new_pgn_file"
+            echo "$line" >> "$new_pgn_file"
+        else
+            echo "$line" >> "$new_pgn_file"
         fi
-        # add the line to the new file until the next event comes
-        echo "$line" >> "$new_file"
     done < "$file"
     echo "All games have been split and saved to '$directory'."
 }

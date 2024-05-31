@@ -20,6 +20,7 @@ parse_pgn() {
 
     echo "Metadata from PGN file:"
     echo "$metadata"
+    echo ""
 
     uci_moves=($(python3 parse_moves.py "$moves"))
 
