@@ -45,7 +45,7 @@ display_board() {
     echo "  a b c d e f g h"
     for ((i=8; i>=1; i--)); do
         row="${board[i]}"
-        echo "$i $row  $i"
+        echo "$i $row $i"
     done
     echo "  a b c d e f g h"
 }
@@ -106,7 +106,7 @@ from_letter_to_number() {
 game_function_loop() {
     while true; do
         echo "Press 'd' to move forward, 'a' to move back, 'w' to go to the start, 's' to go to the end, 'q' to quit:"
-        read -n 1 key
+        read -r key
         case "$key" in
             d)
                 if [ $current_move -lt $move_number ]; then
